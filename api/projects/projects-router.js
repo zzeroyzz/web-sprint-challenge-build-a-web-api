@@ -68,7 +68,16 @@ router.delete('/projects/:id',(req,res) =>{
     })
 })
 router.get('/projects/:id/actions',(req,res) =>{
-    
+    Projects.getProjectActions(req.params.id)
+    .then(pactions =>{
+        res.status(200).json(pactions)
+    })
+    .catch(error =>{
+        console.log(error)
+        res.status(500).json({
+            message:`Error getting for the project ${error.message}`
+        })
+    })
 })
 
 router.use((err,req,res)=>{
