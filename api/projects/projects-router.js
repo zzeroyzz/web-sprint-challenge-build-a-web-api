@@ -3,7 +3,7 @@ const express = require('express');
 const Projects = require('./projects-model.js');
 const router = express.Router();
 
-router.get('/projects',(req,res) =>{
+router.get('/',(req,res) =>{
     Projects.get(req.query)
     .then(project =>{
         res.status(200).json(project)
@@ -15,7 +15,7 @@ router.get('/projects',(req,res) =>{
         })
     })
 })
-router.get('/projects/:id',(req,res) =>{
+router.get('/:id',(req,res) =>{
     Projects.get(req.params.id)
     .then(projects =>{
         if(project){
@@ -31,7 +31,7 @@ router.get('/projects/:id',(req,res) =>{
         })
     })
 })
-router.post('/projects',(req,res) =>{
+router.post('/',(req,res) =>{
     Projects.insert(req.body)
     .then(project =>{
         res.status(201).json(project)
@@ -43,7 +43,7 @@ router.post('/projects',(req,res) =>{
         })
     })
 })
-router.put('/projects/:id',(req,res) =>{
+router.put('/:id',(req,res) =>{
     Projects.update(req.params.id, req.body)
     .then(project =>{
         res.status(200).json(project)
@@ -55,7 +55,7 @@ router.put('/projects/:id',(req,res) =>{
         })
     })
 })
-router.delete('/projects/:id',(req,res) =>{
+router.delete('/:id',(req,res) =>{
     Projects.remove(req.params.id)
     .then(() =>{
         res.status(201).json({message:"Project has been eliminated"})
@@ -67,7 +67,7 @@ router.delete('/projects/:id',(req,res) =>{
         })
     })
 })
-router.get('/projects/:id/actions',(req,res) =>{
+router.get('/:id/actions',(req,res) =>{
     Projects.getProjectActions(req.params.id)
     .then(pactions =>{
         res.status(200).json(pactions)

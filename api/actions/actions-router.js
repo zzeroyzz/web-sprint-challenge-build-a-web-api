@@ -3,7 +3,7 @@ const express = require('express');
 const Actions = require('./actions-model.js');
 const router = express.Router();
 
-router.get('/actions',(req,res) =>{
+router.get('/',(req,res) =>{
     Actions.get(req.query)
     .then(action =>{
         res.status(200).json(action)
@@ -15,7 +15,7 @@ router.get('/actions',(req,res) =>{
         })
     })
 })
-router.get('/actions/:id',(req,res) =>{
+router.get('/:id',(req,res) =>{
     Actions.get(req.params.id)
     .then(action =>{
         if(action){
@@ -31,7 +31,7 @@ router.get('/actions/:id',(req,res) =>{
         })
     })
 })
-router.post('/actions',(req,res) =>{
+router.post('/',(req,res) =>{
     Actions.insert(req.body)
     .then(action =>{
         res.status(201).json(action)
@@ -43,7 +43,7 @@ router.post('/actions',(req,res) =>{
         })
     })
 })
-router.put('/actions/:id',(req,res) =>{
+router.put('/:id',(req,res) =>{
     Actions.update(req.params.id, req.body)
     .then(action =>{
         res.status(200).json(action)
@@ -55,7 +55,7 @@ router.put('/actions/:id',(req,res) =>{
         })
     })
 })
-router.delete('/actions/:id',(req,res) =>{
+router.delete('/:id',(req,res) =>{
     Actions.remove(req.params.id, req.body)
     .then(() =>{
         res.status(201).json({message:"The action has been eliminated"})
