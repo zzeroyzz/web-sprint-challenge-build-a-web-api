@@ -1,90 +1,107 @@
-const express = require('express');
-
+const express= require('express');
 const Projects = require('./projects-model.js');
+const Actions = require('../actions/actions-model.js')
 const router = express.Router();
 
-router.get('/',(req,res) =>{
-    Projects.get(req.query)
-    .then(project =>{
-        res.status(200).json(project)
-    })
-    .catch(error =>{
-        console.log(error)
-        res.status(500).json({
-            message: 'Error retrieving the projects'
-        })
-    })
-})
-router.get('/:id',(req,res) =>{
-    Projects.get(req.params.id)
-    .then(projects =>{
-        if(project){
-            res.status(200).json(project)
-        }else{
-            res.status(404).json({message: 'Project not found'})
+
+
+
+router.get('/api/projects', async (req, res) => {
+    try {
+        const projects = await Projects.get();
+        res.status(200).json(projects);
+    } catch (err) {
+        res.status(500).json({ Error: {err} });
+    }
+});
+
+router.get('/api/projects/:id', async (req, res) => {
+    const {id} = req.params;
+
+    try {
+        const project = await Projects.get(id);
+        if (!project) {
+            res.status(404).json({ message: "The project with the specified id does not exist" });
+        } else {
+            res.status(200).json(project);
         }
+    } catch (err) {
+        res.status(500).json({ Error: {err} });
+    }
+});
+router.post('/api/projects', async (req, res) => {
+    const body = req.body;
+
+    if (!body.name || !body.description) {
+        res.status(400).json({ message: "Please provide name and description" });
+    } else {
+        try {
+            const newProject = await Projects.insert(body);
+            res.status(201).json(newProject);
+        } catch (err) {
+            res.status(500).json({ Error: {err} });
+        }
+    }
+});
+router.delete('/api/projects/:id', async (req, res) => {
+    const {id} = req.params;
+
+    try {
+        const deletedProject = await Projects.remove(id);
+        if (!deletedProject) {
+            res.status(404).json({ message: "The project with the given id does not exist" });
+        } else {
+            res.status(200).json(deletedProject);
+        }
+    } catch (err) {
+        res.status(500).json({ Error: {err} });
+    }
+});
+
+router.put('/api/projects/:id', async (req, res) => {
+    const {id} = req.params;
+    const body = req.body;
+
+    if (!body.name && !body.description) {
+        res.status(400).json({ message: "Please fill out the required fields" });
+    } else {
+        try {
+            const updatedProject = await Projects.update(id, body);
+            res.status(200).json(updatedProject);
+        } catch (err) {
+            res.status(500).json({ Error: {err} });
+        }
+    }
+});
+
+
+
+router.post('/api/projects/:id/actions', (req,res,next) =>{
+    const actionInfo={...req.body, hub_id: req.params.id}
+
+    Actions.add(actionInfo)
+    .then(action =>{
+        res.status(210).json(message)
+    }).catch(err =>{
+        next(err)
     })
-    .catch(error =>{
-        console.log(error);
-        res.status(500).json({
-            message:'Error retrieving the projects'
-        })
-    })
-})
-router.post('/',(req,res) =>{
-    Projects.insert(req.body)
-    .then(project =>{
-        res.status(201).json(project)
-    })
-    .catch(error =>{
-        console.log(error);
-        res.status(500).json({
-            message:'Error adding project'
-        })
-    })
-})
-router.put('/:id',(req,res) =>{
-    Projects.update(req.params.id, req.body)
-    .then(project =>{
-        res.status(200).json(project)
-    })
-    .catch(error =>{
-        console.log(error);
-        res.status(500).json({
-            message:'Error updating the project'
-        })
-    })
-})
-router.delete('/:id',(req,res) =>{
-    Projects.remove(req.params.id)
-    .then(() =>{
-        res.status(201).json({message:"Project has been eliminated"})
-    })
-    .catch(error =>{
-        console.log(error);
-        res.status(500).json({
-            message:'Error eliminating project'
-        })
-    })
-})
-router.get('/:id/actions',(req,res) =>{
-    Projects.getProjectActions(req.params.id)
-    .then(pactions =>{
-        res.status(200).json(pactions)
-    })
-    .catch(error =>{
-        console.log(error)
-        res.status(500).json({
-            message:`Error getting for the project ${error.message}`
-        })
-    })
+
 })
 
-router.use((err,req,res)=>{
+router.get('/api/projects/:id/actions', async (req, res) => {
+    const {id} = req.params;
+
+    try {
+        const projectActions = await Projects.getProjectActions(id);
+        res.status(200).json(projectActions);
+    } catch (err) {
+        res.status(500).json({ Error: {err} });
+    }
+});
+
+router.use((err,req,res,next) => {
     res.status(500).json({
-      message:"Something died",
-      error:err.message
-    })
-  })
-
-  module.exports = router;
+        message:"something blew up",
+        error:err.message
+})})
+module.exports = router;

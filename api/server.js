@@ -10,8 +10,8 @@ server.use(helmet())
 server.use(morgan("dev"))
 server.use(express.json())
 
-server.use('/api/actions',actionsRouter);
-server.use('api/projects', projectsRouter)
+server.use(actionsRouter);
+server.use(projectsRouter)
 
 server.get('/',(req,res) =>{
     res.send(`
